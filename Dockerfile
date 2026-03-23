@@ -31,15 +31,14 @@ RUN mkdir -p /var/www/html/storage \
     && chmod -R 755 /var/www/html/storage
 
 # Настройка Nginx
-RUN rm -rf /etc/nginx/sites-enabled/default
-COPY docker/nginx/railway.conf /etc/nginx/sites-available/default
-RUN ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+RUN rm -f /etc/nginx/sites-enabled/default
+COPY docker/nginx/railway.conf /etc/nginx/conf.d/default.conf
 
 # Создание скрипта запуска
 RUN echo '#!/bin/bash\n\
-service nginx start\n\
+nginx\n\
 php-fpm' > /start.sh && chmod +x /start.sh
 
-EXPOSE 80
+EXPOSE 8080
 
 CMD ["/start.sh"]
