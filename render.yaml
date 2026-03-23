@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: note-manager
+    runtime: docker
+    repo: https://github.com/YOUR_USERNAME/note-manager.git
+    plan: free
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+    healthCheckPath: /
+    autoDeploy: true
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    numReplicas: 1
