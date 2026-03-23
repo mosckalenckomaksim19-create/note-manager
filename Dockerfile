@@ -13,27 +13,27 @@ RUN apt-get update && apt-get install -y \
 # Установка Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Создание директории для приложения
+# Создание рабочей директории
 WORKDIR /var/www/html
 
 # Копирование composer файлов для кэширования
 COPY composer.json composer.lock* ./
 
-# Установка зависимостей (без dev зависимостей)
+# Установка зависимостей
 RUN composer install --no-interaction --optimize-autoloader --no-dev
 
 # Копирование остальных файлов
 COPY . .
 
+# Создание папки storage и установка прав
+RUN mkdir -p /var/www/html/storage \
+    && chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html/storage
+
 # Настройка Nginx
 RUN rm -rf /etc/nginx/sites-enabled/default
-COPY docker/nginx/render.conf /etc/nginx/sites-available/default
+COPY docker/nginx/railway.conf /etc/nginx/sites-available/default
 RUN ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
-
-# Настройка прав
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html/storage \
-    && chmod 777 /var/www/html/storage
 
 # Создание скрипта запуска
 RUN echo '#!/bin/bash\n\
